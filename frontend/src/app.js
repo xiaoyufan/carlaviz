@@ -35,6 +35,8 @@ import {
 } from "streetscape.gl";
 import { Form, ThemeProvider } from "@streetscape.gl/monochrome";
 
+import { InputHandler } from './input_handler';
+
 import { APP_SETTINGS, XVIZ_STYLE, CAR, UI_THEME } from "./constants";
 
 import githubIcon from "../public/github_icon.png";
@@ -218,6 +220,7 @@ class CarlaViz extends PureComponent {
 
 render(
   <ThemeProvider theme={UI_THEME}>
+    <InputHandler />
     <CarlaViz />
   </ThemeProvider>,
   document.getElementById("app")

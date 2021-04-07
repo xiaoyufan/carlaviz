@@ -33,16 +33,24 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && apt-get install -y yarn
 
-RUN echo "latest"
-
-RUN cd /home/carla/ && \
-  git clone --recurse-submodules https://github.com/wx9698/carlaviz.git && \
-  cd carlaviz && \
-  bash ./setup/setup.sh
-
-
 EXPOSE 8080-8081
 EXPOSE 8089
+
+RUN cd /home/carla && \
+  git clone --recurse-submodules https://github.com/wx9698/carlaviz.git && cd carlaviz && \
+  echo `git describe --tags`
+
+# Backend setup
+RUN rm -rf /home/carla/carlaviz/setup/
+COPY setup/ /home/carla/carlaviz/setup/
+RUN cd /home/carla/carlaviz && \
+  bash ./setup/setup.sh
+
+# Frontend setup
+RUN rm -rf /home/carla/carlaviz/frontend && mkdir /home/carla/carlaviz/frontend
+COPY frontend/package.json frontend/yarn.lock /home/carla/carlaviz/frontend/
+RUN cd /home/carla/carlaviz/frontend && yarn
+COPY frontend/ /home/carla/carlaviz/frontend/
 
 USER carla
 ENV CARLAVIZ_HOST_IP localhost

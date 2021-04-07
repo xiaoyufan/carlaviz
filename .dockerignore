@@ -1,0 +1,8 @@
+**/*.md
+docs
+
+.git
+
+**/node_modules
+
+.vscode
