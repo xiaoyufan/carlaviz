@@ -57,7 +57,7 @@ ENV CARLAVIZ_HOST_IP localhost
 ENV CARLA_SERVER_IP localhost
 ENV CARLA_SERVER_PORT 2000
 
-COPY run.sh /home/carla/
+COPY docker/run.sh /home/carla/
 WORKDIR /home/carla
 
 CMD ["./run.sh"]

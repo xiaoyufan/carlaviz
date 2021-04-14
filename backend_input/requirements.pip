@@ -1,2 +1,0 @@
-certifi==2020.12.5
-websocket-server @ git+https://github.com/Pithikos/python-websocket-server@fd0b190de3bef32967f64f673897a96544166593
