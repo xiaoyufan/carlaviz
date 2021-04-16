@@ -8,8 +8,7 @@ class Server:
 	def __init__(self, args):
 		self.args = args
 		self.server = WebsocketServer(self.args.server_port,
-					  host=self.args.server_host,
-					  loglevel=logging.INFO)
+					  host=self.args.server_host)
 
 	def start_game(self):
 		self.game = Game(self.args)

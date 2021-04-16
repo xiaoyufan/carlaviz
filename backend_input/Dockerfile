@@ -1,47 +1,38 @@
-### Base ###
-FROM python:3.7.10-alpine3.13 AS base
+FROM ubuntu:18.04
 
-RUN apk add --no-cache git
+RUN apt update \
+    && apt install -y software-properties-common \
+        python3-pip \
+        libxerces-c3.2 \
+    && apt install -y python3.7 \
+    && apt install -y python3.7-venv \
+    && python3.7 -m pip install pip
 
-RUN python -m venv /opt/venv
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 1AF1527DE64CB8D9 && \
+    add-apt-repository "deb [arch=amd64] http://dist.carla.org/carla $(lsb_release -sc) main" && \
+    apt update && \
+    apt install -y carla-simulator=0.9.10-1
+
+ENV PYTHONPATH="/opt/carla-simulator/PythonAPI/carla/dist/carla-0.9.10-py3.6-linux-x86_64.egg"
+
+RUN python3.7 -m venv /opt/venv
 # Make sure we use the virtualenv:
 ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
-COPY requirements/base.txt requirements.txt
-RUN pip install -r requirements.txt
+COPY requirements.txt requirements.txt
+RUN python3.7 -m pip install -r requirements.txt
+
+ENV SERVER_IP localhost
+ENV SERVER_PORT 13254
+ENV CARLA_SERVER_IP localhost
+ENV CARLA_SERVER_PORT 2000
 
 COPY . .
 
-
-
-### Dev ###
-FROM nikolaik/python-nodejs:python3.7-nodejs14-alpine AS dev
-
-RUN yarn global add nodemon
-
-ENV PATH="/opt/venv/bin:$PATH"
-
-COPY --from=base /opt/venv /opt/venv
-COPY --from=base /app /app
-
-WORKDIR /app
-
-CMD nodemon --exec "python" server.py
-
-
-
-### Prod ###
-FROM python:3.7.10-alpine3.13 AS prod
-
-ENV PATH="/opt/venv/bin:$PATH"
-
-COPY --from=base /opt/venv /opt/venv
-COPY --from=base /app /app
-
-WORKDIR /app
-
-CMD python /app/server.py
-
-
+CMD python3.7 /app/main.py \
+        --server-host $SERVER_IP \
+        --server-port $SERVER_PORT \
+        --carla-host $CARLA_SERVER_IP \
+        --carla-port $CARLA_SERVER_PORT

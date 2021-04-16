@@ -1,3 +1,5 @@
+ENV ?= dev
+
 .PHONY: carlaviz-docker-build
 carlaviz-docker-build:
 	docker build \
@@ -18,18 +20,21 @@ carlaviz-docker-run:
 		-p 8089:8089 \
 		carlaviz
 
-.PHONY: carlaviz-dev
-carlaviz-dev: carlaviz-docker-build carlaviz-docker-run
+.PHONY: carlaviz
+carlaviz: carlaviz-docker-build carlaviz-docker-run
 
-.PHONY: carlaviz-backend-input-dev
-carlaviz-backend-input-dev:
+.PHONY: carlaviz-backend-input
+carlaviz-backend-input:
 	docker build \
 		-t carlaviz-backend-input \
-		--target dev \
 		backend_input
 	docker run \
 		-it \
 		--rm \
-		--name carlaviz-backend-input  \
+		--name carlaviz-backend-input-$(ENV)  \
+		-e SERVER_IP=0.0.0.0 \
+		-e SERVER_PORT=13254 \
+		-e CARLA_SERVER_IP=host.docker.internal \
+		-e CARLA_SERVER_PORT=2000 \
 		-p 13254:13254 \
 		carlaviz-backend-input
